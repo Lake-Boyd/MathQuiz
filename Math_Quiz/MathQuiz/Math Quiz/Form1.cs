@@ -10,6 +10,9 @@ using System.Windows.Forms;
 
 namespace Math_Quiz
 {
+
+
+
     public partial class Form1 : Form
     {
 
@@ -24,6 +27,23 @@ namespace Math_Quiz
         int addend1;
         int addend2;
 
+
+        // These integer variables store the numbers 
+        // for the subtraction problem. 
+        int subtrahend;
+        int minuend;
+
+        // These integer variables store the numbers 
+        // for the multiplication problem. 
+        int multiplicand;
+        int multiplier;
+
+        // These integer variables store the numbers 
+        // for the division problem. 
+        int dividend;
+        int divisor;
+
+
         /// <summary>
         /// Start the quiz by filling in all of the problems
         /// and starting the timer.
@@ -31,6 +51,7 @@ namespace Math_Quiz
         /// 
         int timeLeft;
 
+ 
         public void StartTheQuiz()
         {
 
@@ -54,6 +75,30 @@ namespace Math_Quiz
 
             sum.Value = 0;
 
+
+            // Fill in the subtraction problem.
+            minuend = randomizer.Next(1, 101);
+            subtrahend = randomizer.Next(1, minuend);
+            minusLeftLabel.Text = minuend.ToString();
+            minusRightLabel.Text = subtrahend.ToString();
+            difference.Value = 0;
+
+            // Fill in the multiplication problem.
+            multiplicand = randomizer.Next(2, 11);
+            multiplier = randomizer.Next(2, 11);
+            timesLeftLabel.Text = multiplicand.ToString();
+            timesRightLabel.Text = multiplier.ToString();
+            product.Value = 0;
+
+            // Fill in the division problem.
+            divisor = randomizer.Next(2, 11);
+            int temporaryQuotient = randomizer.Next(2, 11);
+            dividend = divisor * temporaryQuotient;
+            divideLeftLabel.Text = dividend.ToString();
+            divideRightLabel.Text = divisor.ToString();
+            quotient.Value = 0;
+
+
             // Start the timer.
             timeLeft = 30;
             timeLabel.Text = "30 seconds";
@@ -67,10 +112,16 @@ namespace Math_Quiz
         public Form1()
         {
             InitializeComponent();
+            DateTime thisDay = DateTime.Today;
+            string dateString = thisDay.ToString("D");
+            date.Text = dateString;
         }
 
         private void startButton_Click(object sender, EventArgs e)
         {
+
+
+
             StartTheQuiz();
             startButton.Enabled = false;
         }
@@ -78,13 +129,37 @@ namespace Math_Quiz
         private void timer1_Tick(object sender, EventArgs e)
         {
 
-            if (timeLeft > 0)
+            if (timeLeft < 6)
+
+                timeLabel.ForeColor = Color.Red;
+
+            else
+
+                timeLabel.ForeColor = Color.Black;
+
+
+            if (CheckTheAnswer())
             {
 
-                // Display the new time left
-                // by updating the Time Left label.
+                // If CheckTheAnswer() returns true, then the user 
+                // got the answer right. Stop the timer  
+                // and show a MessageBox.
+                timer1.Stop();
+                MessageBox.Show("You got all the answers right!", "Congratulations!");
+                startButton.Enabled = true;
 
-                timeLeft = timeLeft - 1;
+            }
+
+
+            else if (timeLeft > 0)
+            {
+
+                // If CheckTheAnswer() return false, keep counting
+                // down. Decrease the time left by one second and 
+                // display the new time left by updating the 
+                // Time Left label.
+
+                timeLeft--;
                 timeLabel.Text = timeLeft + " seconds";
             }
             else
@@ -94,12 +169,49 @@ namespace Math_Quiz
                 // a MessageBox, and fill in the answers.
 
                 timer1.Stop();
-                timeLabel.Text = "Times up!";
+                timeLabel.Text = "Time is up!";
                 MessageBox.Show("You didn't finish in time.", "Sorry!");
                 sum.Value = addend1 + addend2;
+                difference.Value = minuend - subtrahend;
+                product.Value = multiplicand * multiplier;
+                quotient.Value = dividend / divisor;
                 startButton.Enabled = true;
 
             }
+
+
+
+        }
+
+
+        private bool CheckTheAnswer()
+        {
+
+
+            if ((addend1 + addend2 == sum.Value) && (minuend - subtrahend == difference.Value) && (multiplicand * multiplier == product.Value)
+                && (dividend / divisor == quotient.Value))
+                return true;
+            else
+                return false;
+
+
+
+        }
+
+        private void answer_Enter(object sender, EventArgs e)
+        {
+            // Select the whole answer in the NumericUpDown control.
+            NumericUpDown answerBox = sender as NumericUpDown;
+
+            if (answerBox != null)
+            {
+
+                int lengthOfAnswer = answerBox.Value.ToString().Length;
+                answerBox.Select(0, lengthOfAnswer);
+
+
+            }
+
 
         }
     }
